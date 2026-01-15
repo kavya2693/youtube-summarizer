@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Video Summarizer</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>YouTube Video Summarizer</h1>
+            <p>Paste a YouTube URL to get a summary, key takeaways, and ask questions</p>
+        </header>
+
+        <section class="input-section">
+            <div class="url-input-container">
+                <input
+                    type="text"
+                    id="youtube-url"
+                    placeholder="Paste YouTube URL here (e.g., https://www.youtube.com/watch?v=...)"
+                >
+                <button id="process-btn" onclick="processVideo()">Summarize</button>
+            </div>
+            <div id="status-message" class="status-message"></div>
+        </section>
+
+        <section id="results-section" class="results-section hidden">
+            <div class="result-card">
+                <h2 id="video-title">Video Title</h2>
+
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="showTab('summary')">Summary</button>
+                    <button class="tab-btn" onclick="showTab('takeaways')">Key Takeaways</button>
+                    <button class="tab-btn" onclick="showTab('qa')">Q&A</button>
+                    <button class="tab-btn" onclick="showTab('visual')">Visual Q&A</button>
+                    <button class="tab-btn" onclick="showTab('transcript')">Transcript</button>
+                </div>
+
+                <div id="summary-tab" class="tab-content active">
+                    <div id="summary-content" class="content-box"></div>
+                </div>
+
+                <div id="takeaways-tab" class="tab-content">
+                    <ul id="takeaways-list" class="takeaways-list"></ul>
+                </div>
+
+                <div id="qa-tab" class="tab-content">
+                    <div id="chat-messages" class="chat-messages"></div>
+                    <div class="chat-input-container">
+                        <input
+                            type="text"
+                            id="question-input"
+                            placeholder="Ask a question about this video..."
+                            onkeypress="handleQuestionKeypress(event)"
+                        >
+                        <button onclick="askQuestion()">Ask</button>
+                    </div>
+                </div>
+
+                <div id="visual-tab" class="tab-content">
+                    <div class="visual-section">
+                        <div id="visual-status" class="visual-status">
+                            <p>Analyze the video visually to detect people, colors, and objects.</p>
+                            <button id="analyze-btn" onclick="startVisualAnalysis()">
+                                Analyze Video Frames
+                            </button>
+                        </div>
+                        <div id="visual-results" class="visual-results hidden">
+                            <div class="visual-stats">
+                                <div class="stat-card">
+                                    <span class="stat-value" id="frames-count">0</span>
+                                    <span class="stat-label">Frames Analyzed</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-value" id="persons-count">0</span>
+                                    <span class="stat-label">Person Detections</span>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="color-swatch" id="shirt-color-swatch"></div>
+                                    <span class="stat-label" id="shirt-color-label">Shirt Color</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="visual-chat-messages" class="chat-messages"></div>
+                        <div class="chat-input-container">
+                            <input
+                                type="text"
+                                id="visual-question-input"
+                                placeholder="Ask about visuals (e.g., 'What color shirt is he wearing?')"
+                                onkeypress="handleVisualQuestionKeypress(event)"
+                            >
+                            <button onclick="askVisualQuestion()">Ask</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="transcript-tab" class="tab-content">
+                    <div id="transcript-content" class="content-box transcript"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

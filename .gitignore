@@ -1,0 +1,21 @@
+# Environment
+venv/
+.env
+*.pyc
+__pycache__/
+
+# Data files
+data/
+*.mp4
+*.mp3
+*.webm
+
+# Model files (downloaded automatically)
+*.pt
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
