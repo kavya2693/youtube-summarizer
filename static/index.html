@@ -3,103 +3,281 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Video Summarizer</title>
+    <title>Video Intelligence - AI-Powered Video Analysis</title>
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>YouTube Video Summarizer</h1>
-            <p>Paste a YouTube URL to get a summary, key takeaways, and ask questions</p>
+            <h1>Video Intelligence</h1>
+            <p>AI-powered video analysis: Object Detection, Classification, Segmentation & More</p>
         </header>
 
-        <section class="input-section">
+        <!-- Audio Transcription -->
+        <section id="transcribe-section" class="input-section">
+            <h2 style="text-align:center; margin-bottom: 0.5rem;">Audio Transcription</h2>
+            <p style="text-align:center; color: #aaa; margin-bottom: 1rem;">Upload an audio file to get a transcript</p>
+            <div class="url-input-container" style="flex-direction: column; gap: 1rem;">
+                <input type="file" id="audio-file" accept=".mp3,.mp4,.m4a,.wav,.webm,.ogg,.flac,.opus" style="width:100%;">
+                <button id="transcribe-btn" onclick="transcribeAudio()">Transcribe</button>
+            </div>
+            <div id="transcribe-status" class="status-message"></div>
+            <div id="transcribe-results" style="margin-top: 1rem; display: none;">
+                <h4>Transcript</h4>
+                <div id="transcript-text" class="content-box" style="white-space: pre-wrap; max-height: 400px; overflow-y: auto; padding: 1rem; background: #1a1a2e; border-radius: 8px;"></div>
+                <button onclick="copyTranscript()" style="margin-top: 0.5rem;" class="action-btn">Copy to Clipboard</button>
+            </div>
+        </section>
+
+        <div style="text-align:center; color:#555; margin: 1rem 0;">— or —</div>
+
+        <!-- YouTube Explorer - Always visible -->
+        <section id="explorer-section" class="explorer-section">
+            <div class="explorer-card" onclick="openYouTubeExplorer()">
+                <div class="explorer-icon">🔍</div>
+                <div class="explorer-content">
+                    <h3>YouTube Explorer</h3>
+                    <p>Ask questions like "What's the latest video from Eric Weinstein?" or "Trending quantum physics videos"</p>
+                </div>
+                <span class="explorer-action">Open Chat →</span>
+            </div>
+        </section>
+
+        <!-- Step 1: URL Input -->
+        <section id="input-section" class="input-section">
+            <div class="section-divider">Or analyze a specific video:</div>
             <div class="url-input-container">
                 <input
                     type="text"
                     id="youtube-url"
                     placeholder="Paste YouTube URL here (e.g., https://www.youtube.com/watch?v=...)"
                 >
-                <button id="process-btn" onclick="processVideo()">Summarize</button>
+                <button id="process-btn" onclick="processVideo()">Load Video</button>
             </div>
             <div id="status-message" class="status-message"></div>
         </section>
 
-        <section id="results-section" class="results-section hidden">
-            <div class="result-card">
-                <h2 id="video-title">Video Title</h2>
+        <!-- Step 2: Feature Selection (Main Menu) -->
+        <section id="features-section" class="features-section hidden">
+            <div class="video-info-bar">
+                <span id="current-video-title">Video loaded</span>
+                <button class="change-video-btn" onclick="changeVideo()">Change Video</button>
+            </div>
 
-                <div class="tabs">
-                    <button class="tab-btn active" onclick="showTab('summary')">Summary</button>
-                    <button class="tab-btn" onclick="showTab('takeaways')">Key Takeaways</button>
-                    <button class="tab-btn" onclick="showTab('qa')">Q&A</button>
-                    <button class="tab-btn" onclick="showTab('visual')">Visual Q&A</button>
-                    <button class="tab-btn" onclick="showTab('transcript')">Transcript</button>
+            <h2 class="section-title">Choose Analysis Type</h2>
+
+            <div class="features-grid">
+                <div class="feature-card" onclick="navigateToFeature('detection')">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Object Detection</h3>
+                    <p>Detect and count all objects in video frames using YOLO AI. See bounding boxes around detected objects.</p>
+                    <ul class="feature-highlights">
+                        <li>Identify objects (people, vehicles, animals)</li>
+                        <li>Count occurrences across frames</li>
+                        <li>View annotated frames with boxes</li>
+                    </ul>
+                    <span class="feature-action">Start Detection →</span>
                 </div>
 
-                <div id="summary-tab" class="tab-content active">
-                    <div id="summary-content" class="content-box"></div>
+                <div class="feature-card" onclick="navigateToFeature('classification')">
+                    <div class="feature-icon">📊</div>
+                    <h3>Classification</h3>
+                    <p>Classify detected objects into meaningful categories with confidence scores.</p>
+                    <ul class="feature-highlights">
+                        <li>Group by category (Aircraft, Vehicles, People)</li>
+                        <li>Confidence percentages</li>
+                        <li>Sorted by frequency</li>
+                    </ul>
+                    <span class="feature-action">Classify Objects →</span>
                 </div>
 
-                <div id="takeaways-tab" class="tab-content">
-                    <ul id="takeaways-list" class="takeaways-list"></ul>
+                <div class="feature-card" onclick="navigateToFeature('segmentation')">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Segmentation</h3>
+                    <p>Segment video frames into distinct regions based on color and content.</p>
+                    <ul class="feature-highlights">
+                        <li>Identify sky, ground, vegetation</li>
+                        <li>Analyze color distribution</li>
+                        <li>Region percentages</li>
+                    </ul>
+                    <span class="feature-action">Segment Frames →</span>
                 </div>
 
-                <div id="qa-tab" class="tab-content">
-                    <div id="chat-messages" class="chat-messages"></div>
-                    <div class="chat-input-container">
-                        <input
-                            type="text"
-                            id="question-input"
-                            placeholder="Ask a question about this video..."
-                            onkeypress="handleQuestionKeypress(event)"
-                        >
-                        <button onclick="askQuestion()">Ask</button>
-                    </div>
+                <div class="feature-card" onclick="navigateToFeature('change')">
+                    <div class="feature-icon">📈</div>
+                    <h3>Change Detection</h3>
+                    <p>Detect motion and scene changes between consecutive video frames.</p>
+                    <ul class="feature-highlights">
+                        <li>Motion score analysis</li>
+                        <li>Scene change detection</li>
+                        <li>Frame-by-frame comparison</li>
+                    </ul>
+                    <span class="feature-action">Detect Changes →</span>
                 </div>
 
-                <div id="visual-tab" class="tab-content">
-                    <div class="visual-section">
-                        <div id="visual-status" class="visual-status">
-                            <p>Analyze the video visually to detect people, colors, and objects.</p>
-                            <button id="analyze-btn" onclick="startVisualAnalysis()">
-                                Analyze Video Frames
-                            </button>
-                        </div>
-                        <div id="visual-results" class="visual-results hidden">
-                            <div class="visual-stats">
-                                <div class="stat-card">
-                                    <span class="stat-value" id="frames-count">0</span>
-                                    <span class="stat-label">Frames Analyzed</span>
-                                </div>
-                                <div class="stat-card">
-                                    <span class="stat-value" id="persons-count">0</span>
-                                    <span class="stat-label">Person Detections</span>
-                                </div>
-                                <div class="stat-card">
-                                    <div class="color-swatch" id="shirt-color-swatch"></div>
-                                    <span class="stat-label" id="shirt-color-label">Shirt Color</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="visual-chat-messages" class="chat-messages"></div>
-                        <div class="chat-input-container">
-                            <input
-                                type="text"
-                                id="visual-question-input"
-                                placeholder="Ask about visuals (e.g., 'What color shirt is he wearing?')"
-                                onkeypress="handleVisualQuestionKeypress(event)"
-                            >
-                            <button onclick="askVisualQuestion()">Ask</button>
-                        </div>
-                    </div>
+                <div class="feature-card" onclick="navigateToFeature('visual')">
+                    <div class="feature-icon">💬</div>
+                    <h3>Visual Q&A</h3>
+                    <p>Ask questions about the video content and get AI-powered answers.</p>
+                    <ul class="feature-highlights">
+                        <li>Ask about colors, objects, actions</li>
+                        <li>Natural language questions</li>
+                        <li>Context-aware responses</li>
+                    </ul>
+                    <span class="feature-action">Ask Questions →</span>
                 </div>
 
-                <div id="transcript-tab" class="tab-content">
-                    <div id="transcript-content" class="content-box transcript"></div>
+                <div class="feature-card" onclick="navigateToFeature('summary')">
+                    <div class="feature-icon">📝</div>
+                    <h3>Summary & Takeaways</h3>
+                    <p>Get an AI-generated summary and key takeaways from the video.</p>
+                    <ul class="feature-highlights">
+                        <li>Video transcript</li>
+                        <li>Concise summary</li>
+                        <li>Key points extraction</li>
+                    </ul>
+                    <span class="feature-action">Get Summary →</span>
                 </div>
             </div>
         </section>
+
+        <!-- Feature Pages -->
+        <section id="feature-page" class="feature-page hidden">
+            <div class="page-header">
+                <button class="back-btn" onclick="goBackToMenu()">← Back to Menu</button>
+                <h2 id="page-title">Feature</h2>
+            </div>
+
+            <!-- Object Detection Page -->
+            <div id="detection-page" class="page-content hidden">
+                <p class="page-description">Detect and count all objects in the video frames using YOLO AI.</p>
+                <button id="detect-btn" class="action-btn" onclick="runObjectDetection()">Run Object Detection</button>
+                <div id="detection-results" class="results-grid hidden">
+                    <div class="stat-card">
+                        <span class="stat-value" id="total-objects">0</span>
+                        <span class="stat-label">Objects Detected</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="unique-classes">0</span>
+                        <span class="stat-label">Unique Classes</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="frames-processed">0</span>
+                        <span class="stat-label">Frames Processed</span>
+                    </div>
+                </div>
+                <div id="detection-list" class="content-box hidden"></div>
+                <div id="frames-gallery" class="frames-gallery hidden"></div>
+            </div>
+
+            <!-- Classification Page -->
+            <div id="classification-page" class="page-content hidden">
+                <p class="page-description">Classify detected objects into categories (vehicles, aircraft, people, etc.)</p>
+                <button id="classify-btn" class="action-btn" onclick="runClassification()">Run Classification</button>
+                <div id="classification-results" class="content-box hidden"></div>
+            </div>
+
+            <!-- Segmentation Page -->
+            <div id="segmentation-page" class="page-content hidden">
+                <p class="page-description">Segment different regions in video frames (sky, ground, objects).</p>
+                <button id="segment-btn" class="action-btn" onclick="runSegmentation()">Run Segmentation</button>
+                <div id="segmentation-results" class="content-box hidden"></div>
+            </div>
+
+            <!-- Change Detection Page -->
+            <div id="change-page" class="page-content hidden">
+                <p class="page-description">Detect changes between video frames (motion, new objects, etc.)</p>
+                <button id="change-btn" class="action-btn" onclick="runChangeDetection()">Run Change Detection</button>
+                <div id="change-results" class="content-box hidden"></div>
+            </div>
+
+            <!-- Visual Q&A Page -->
+            <div id="visual-page" class="page-content hidden">
+                <div class="visual-section">
+                    <div id="visual-status" class="visual-status">
+                        <p>Analyze the video visually to detect people, colors, and objects.</p>
+                        <button id="analyze-btn" onclick="startVisualAnalysis()">
+                            Analyze Video Frames
+                        </button>
+                    </div>
+                    <div id="visual-results" class="visual-results hidden">
+                        <div class="visual-stats">
+                            <div class="stat-card">
+                                <span class="stat-value" id="frames-count">0</span>
+                                <span class="stat-label">Frames Analyzed</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-value" id="persons-count">0</span>
+                                <span class="stat-label">Person Detections</span>
+                            </div>
+                            <div class="stat-card">
+                                <div class="color-swatch" id="shirt-color-swatch"></div>
+                                <span class="stat-label" id="shirt-color-label">Shirt Color</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="visual-chat-messages" class="chat-messages"></div>
+                    <div class="chat-input-container">
+                        <input
+                            type="text"
+                            id="visual-question-input"
+                            placeholder="Ask about visuals (e.g., 'What color shirt is he wearing?')"
+                            onkeypress="handleVisualQuestionKeypress(event)"
+                        >
+                        <button onclick="askVisualQuestion()">Ask</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Page -->
+            <div id="summary-page" class="page-content hidden">
+                <p class="page-description">Get an AI-generated summary and key takeaways from the video.</p>
+                <button id="summary-btn" class="action-btn" onclick="generateSummary()">Generate Summary</button>
+                <div id="summary-results" class="hidden">
+                    <div class="summary-section">
+                        <h4>Summary</h4>
+                        <div id="video-summary" class="content-box"></div>
+                    </div>
+                    <div class="summary-section">
+                        <h4>Key Takeaways</h4>
+                        <ul id="takeaways-list" class="takeaways-list"></ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- YouTube Explorer Modal -->
+    <div id="youtube-explorer-modal" class="modal hidden">
+        <div class="modal-content explorer-modal">
+            <div class="modal-header">
+                <h2>🔍 YouTube Explorer</h2>
+                <button class="close-btn" onclick="closeYouTubeExplorer()">&times;</button>
+            </div>
+            <div class="explorer-chat">
+                <div id="explorer-messages" class="explorer-messages">
+                    <div class="bot-message">
+                        <p>Hi! I can help you discover YouTube videos. Try asking:</p>
+                        <ul>
+                            <li>"Latest video from Eric Weinstein on quantum"</li>
+                            <li>"Trending music videos"</li>
+                            <li>"Videos about AI that went viral this week"</li>
+                            <li>"Best physics explanations"</li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="explorer-videos" class="explorer-videos"></div>
+                <div class="explorer-input-container">
+                    <input
+                        type="text"
+                        id="explorer-input"
+                        placeholder="Ask about YouTube videos..."
+                        onkeypress="handleExplorerKeypress(event)"
+                    >
+                    <button onclick="sendExplorerMessage()">Send</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="/static/app.js"></script>

@@ -6,7 +6,7 @@ MODEL_NAME = "llama-3.1-8b-instant"
 def get_client():
     api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
-        raise ValueError("GROQ_API_KEY environment variable not set. Get free key at https://console.groq.com")
+        raise RuntimeError("GROQ_API_KEY environment variable is not set")
     return Groq(api_key=api_key)
 
 def generate_summary(transcript: str, title: str) -> dict:

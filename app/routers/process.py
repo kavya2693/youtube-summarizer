@@ -22,6 +22,7 @@ def process_video_task(url: str, video_id: str):
         video_store[video_id]['status'] = 'transcribing'
         video_store[video_id]['title'] = info['title']
 
+        # Transcribe via Groq Whisper API (cloud-based)
         transcript_result = transcription.transcribe_audio(info['audio_path'])
 
         transcription.save_transcript(video_id, transcript_result, DATA_DIR)
